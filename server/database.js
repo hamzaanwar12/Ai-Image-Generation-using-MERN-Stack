@@ -1,13 +1,12 @@
 // import mongodb from "mongodb";
 import mongoose from "mongoose";
 
-const ConnectDBwithApp = (url,appListener) => {
+const ConnectDBwithApp = (url) => {
   // compassDB_URL
   mongoose
     .connect(url)
     .then(() => {
       console.log("database connected");
-      appListener();
     })
     .catch((error) => {
       console.log("Database not conected");

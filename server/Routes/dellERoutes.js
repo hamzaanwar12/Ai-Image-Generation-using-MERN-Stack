@@ -4,13 +4,18 @@ import pkg from 'openai';
 import * as dotenv from "dotenv"
 
 dotenv.config()
-
-
-const {Configuration,openAIApi} = pkg;
-
-
-
 const dellERouter = express.Router();
+
+
+const {Configuration,OpenAIApi} = pkg;
+
+//configuration openAi in the app
+const configuration = new Configuration(
+  {
+    apiKey:process.env.OpenAISecretKey
+  }
+)
+const openai = new OpenAIApi(configuration)
 
 dellERouter.route("/")
 .get(async (req, res) => {

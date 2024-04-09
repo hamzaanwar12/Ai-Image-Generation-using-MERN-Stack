@@ -1,19 +1,29 @@
-import express  from "express"
-import cors from "cors"
-import * as dotenv from "dotenv"
-import {postRouter,dellERouter} from "./Routes/indexRoutes.js"
+import express from "express";
+import cors from "cors";
+import * as dotenv from "dotenv";
+import { postRouter, dellERouter } from "./Routes/indexRoutes.js";
+import ConnectDBwithApp from "./database.js"; // Import ConnectDBwithApp function
 
-const app = express()
+dotenv.config();
 
-dotenv.config()
+const app = express();
 
-app.use(cors)
-app.use(express.json({limit:"50mb"}))
+// Middleware
+app.use(cors());
+app.use(express.json({ limit: "50mb" }));
 
-app.use("api/v1/post",postRouter)
-app.use("api/v1/dellE",dellERouter)
+// Routes
+app.get("/", async (req, res) => {
+  try {
+    res.status(200).send("Check data");
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
 
-app.get("/", (req, res) => res.send(`Server Running Working at ${req.url}`))
+app.use("/api/v1/post", postRouter);
+app.use("/api/v1/dellE", dellERouter);
 
 
 
