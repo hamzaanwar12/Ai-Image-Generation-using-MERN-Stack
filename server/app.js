@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import * as dotenv from "dotenv";
 import { postRouter, dellERouter } from "./Routes/indexRoutes.js";
-import ConnectDBwithApp from "./database.js"; // Import ConnectDBwithApp function
 
 dotenv.config();
 
@@ -24,7 +23,6 @@ app.get("/", async (req, res) => {
 
 app.use("/api/v1/post", postRouter);
 app.use("/api/v1/dellE", dellERouter);
-
 
 
 export default app

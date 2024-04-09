@@ -19,7 +19,7 @@ const openai = new OpenAIApi(configuration)
 
 dellERouter.route("/")
 .get(async (req, res) => {
-  req.status(200).send("dellE Router Send");
+  res.status(200).send("dellE Router Send");
 })
 .post(async (req, res) =>{
 
