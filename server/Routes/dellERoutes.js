@@ -1,5 +1,13 @@
 import express from "express";
 import {dellEModel} from "../Models/indexModels.js"
+import pkg from 'openai';
+import * as dotenv from "dotenv"
+
+dotenv.config()
+
+
+const {Configuration,openAIApi} = pkg;
+
 
 
 const dellERouter = express.Router();
