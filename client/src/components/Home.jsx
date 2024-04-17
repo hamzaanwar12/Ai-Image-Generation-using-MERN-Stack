@@ -1,13 +1,54 @@
 import React from "react";
 import { Loader } from "../utitlis/index.js";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FormField from "./FormField";
-import {RenderCards} from "../utitlis/index.js";
+import { RenderCards } from "../utitlis/index.js";
 export default function Home() {
   const [loading, setLoading] = useState(false);
-
-
   const [searchText, setSearchText] = useState(null);
+  const [allPosts, setallPosts] = useState([]);
+  const [searchTimeout, setSearchTimeout] = useState(null);
+  const [searchedResults, setSearchedResults] = useState(null);
+
+  useEffect(() => {
+    try {
+      const fetchPosts = async () => {
+        setLoading(true);
+
+        const response = await fetch("http://localhost:3000/api/v1/post/", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          setallPosts(result.data.reverse());
+        }
+      };
+    } catch (error) {
+      console.log("Errotr i  fetrching the all Shared posts");
+      alert("Posts Couldn't Fetched");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const handleSearch = (event) => 
+  {
+    
+    clearTimeout(searchTimeout);
+    setSearchText(event.target.value);
+
+    setSearchTimeout(
+      setTimeout(() => {
+        const searchResult = allPosts.filter((item) => item.name.toLowerCase().includes(searchText.toLowerCase()) || item.prompt.toLowerCase().includes(searchText.toLowerCase()));
+        setSearchedResults(searchResult);
+      }, 500),
+    );
+
+  };
 
   return (
     <div className="md:w-[65%] md:mt-[4%] md:mx-auto">
@@ -21,13 +62,20 @@ export default function Home() {
         </p>
       </div>
       <div className="mt-[5%]">
-        <FormField />
+        <input
+          className="outline-0 w-full border px-4 italic border-gray-300/50 h-[1.75rem] bg-slate-50 text-gray-800 italics"
+          name={"search"}
+          type={"text"}
+          value={searchText}
+          placeholder={"Search Posts"}
+          onChange={handleSearch}
+        />
       </div>
       {loading ? <Loader /> : <div></div>}
       {searchText ? (
-        <RenderCards data={[]} title={"No Search Post Result Found"} />
+        <RenderCards data={allPosts} title={"No Search Post Result Found"} />
       ) : (
-        <RenderCards data={[]} title={"No Post Found"} />
+        <RenderCards data={allPosts} title={"No Post Found"} />
       )}
     </div>
   );

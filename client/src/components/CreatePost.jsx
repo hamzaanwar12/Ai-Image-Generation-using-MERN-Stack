@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import FormField from "./FormField";
 import preview from "../assets/preview.png";
-import { getSurprisePrompt,Loader } from "../utitlis/index.js";
+import { getSurprisePrompt, Loader } from "../utitlis/index.js";
+import { useNavigate } from "react-router-dom";
+
+
 export default function CreatePost() {
   const [generatingImage, setGeneratingImage] = useState(false);
   const [shareImage, setShareImage] = useState(false);
@@ -13,10 +16,38 @@ export default function CreatePost() {
     photo: null,
   });
 
-  const handleGenerate = (event) => {
+  const navigate = useNavigate();
+
+
+  const handleGenerate = async (event) => {
     event.preventDefault();
-    setGeneratingImage(true);
-    console.log("Generating");
+
+    if (form.prompt.trim().length > 0) 
+    {
+      try {
+        setGeneratingImage(true);
+        const response = await fetch(" http://localhost:3000/api/v1/dellE/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            prompt: form.prompt,
+          }),
+        });
+        const data = await response.json();
+        setForm({ ...form, photo: `data:image/jpeg;base64,${data.photo}` });
+        setGeneratingImage(false);
+      } catch (error) {
+        console.log("Error in the Image Generation");
+        console.log(error);
+      } finally {
+        setGeneratingImage(false);
+      }
+    }
+    else{
+      alert("Enter Prompt")
+    }
   };
 
   const handleChange = (event) => {
@@ -24,10 +55,38 @@ export default function CreatePost() {
     console.log("Changing");
   };
   const handleSupriseMe = (event) => {
-    event.preventDefault()
+    event.preventDefault();
     console.log("Surprise Me");
-    const randomPrompt = getSurprisePrompt(form.prompt)
-    setForm({...form,prompt:randomPrompt})
+    const randomPrompt = getSurprisePrompt(form.prompt);
+    setForm({ ...form, prompt: randomPrompt });
+  };
+
+  const handleShare = async (event) => 
+  {
+    event.preventDefault();
+    if (form.name && form.prompt)
+      setLoading(true)
+
+      try {
+        const response = await fetch("http://localhost:3000/api/v1/post/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(form),
+        });
+
+        
+        await response.json();
+        navigate("/")
+        
+      } catch (error) {
+        console.log(error);
+        alert(error);
+      }finally{
+        setLoading(false)
+      }
+
   };
 
   return (
@@ -40,7 +99,7 @@ export default function CreatePost() {
         </p>
       </div>
 
-      <form className="mt-[5%] flex flex-col gap-y-5" onSubmit={handleGenerate}>
+      <form className="mt-[5%] flex flex-col gap-y-5" onSubmit={handleShare}>
         <FormField
           labelName={"Your Name"}
           name="name"
@@ -82,7 +141,7 @@ export default function CreatePost() {
         </div>
         <div>
           <button
-            type="submit"
+            onClick={handleGenerate}
             className={
               "text-center w-[150px] rounded cursor-pointer" +
               (generatingImage
@@ -94,26 +153,27 @@ export default function CreatePost() {
             {generatingImage ? "Generating..." : "Generate"}
           </button>
         </div>
-      </form>
-      <div className="flex flex-col">
-        <h2 className="mb-4 text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
-          Once you have created the image you can share it with others in the cmmunity
-        </h2>
-        <div className="">
-          <button
-            type="submit"
-            className={
-              "text-center w-full rounded cursor-pointer" +
-              (generatingImage
-                ? " h-[44px] border-2 border-gray-400 text-gray-700"
-                : " h-[40px] bg-green-700 border-0  border-green-700 text-white hover:bg-white hover:border-2 hover:text-green-700 active:bg-green-700  active:text-white")
-            }
-            disabled={shareImage ? true : false}
-          >
-            {shareImage ? "Sharing..." : "Share Images with Community"}
-          </button>
+        <div className="flex flex-col">
+          <h2 className="mb-4 text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
+            Once you have created the image you can share it with others in the
+            cmmunity
+          </h2>
+          <div className="">
+            <button
+              type="submit"
+              className={
+                "text-center w-full rounded cursor-pointer" +
+                (shareImage
+                  ? " h-[44px] border-2 border-gray-400 text-gray-700"
+                  : " h-[40px] bg-green-700 border-0  border-green-700 text-white hover:bg-white hover:border-2 hover:text-green-700 active:bg-green-700  active:text-white")
+              }
+              disabled={shareImage ? true : false}
+            >
+              {shareImage ? "Sharing..." : "Share Images with Community"}
+            </button>
+          </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import FileSaver from 'file-saver';
 import Loader from "../components/Loader"
 import Card from "../components/Card"
 import RenderCards from "../components/RenderCards"
@@ -11,6 +12,9 @@ const getSurprisePrompt = (prompt)=>
     else
       return newPrompt
 }
+const downloadImage = (_id, photo)=>{
+  FileSaver.saveAs(photo, `download-${_id}.jpg`);
+}
 
 
-export {surpriseMePrompts,Loader,Card,RenderCards,getSurprisePrompt}
+export {surpriseMePrompts,Loader,Card,RenderCards,getSurprisePrompt,downloadImage}

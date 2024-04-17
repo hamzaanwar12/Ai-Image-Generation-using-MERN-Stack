@@ -2,7 +2,7 @@ import React from "react";
 import Card from "./Card";
 export default function RenderCards({ data, title }) {
   if (data.length > 0)
-    return data.map((element) => <Card data={element.data} />);
+    return data.map((element) => <Card key={element._id} {...element.data} />);
 
   return (
     <div className="mt-[5%] w-[100%">
